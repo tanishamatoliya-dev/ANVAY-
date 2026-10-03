@@ -1,0 +1,6 @@
+{
+  "name": "UNLOX - Therapist Practice Management",
+  "description": "Editorial, production-ready practice management platform for independent therapists and their clients, featuring scheduling, intake, notes, billing, and secure communication.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
