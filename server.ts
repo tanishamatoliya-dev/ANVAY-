@@ -63,13 +63,9 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 
 async function startServer() {
   try {
-    // 1. Initialize Database connection (Atlas or resilient in-memory fallback)
     await connectDB();
-
-    // 2. Initialize Seed data for development/demo inspectability
     await seedDevelopmentData();
 
-    // 3. Mount Frontend: Vite middleware in dev, static files in production
     const isProd = process.env.NODE_ENV === 'production';
 
     if (!isProd) {
@@ -82,7 +78,7 @@ async function startServer() {
         appType: 'spa',
       });
       app.use(vite.middlewares);
-      console.log('[UNLOX] Vite middleware attached in development mode.');
+      console.log('[ANVAY] Vite middleware attached in development mode.');
     } else {
       app.use(express.static(path.resolve(__dirname, 'dist')));
       app.get('*', (req, res) => {
@@ -98,7 +94,7 @@ async function startServer() {
       console.log(`=======================================================`);
     });
   } catch (err) {
-    console.error('Failed to start UNLOX server:', err);
+    console.error('Failed to start ANVAY server:', err);
     process.exit(1);
   }
 }

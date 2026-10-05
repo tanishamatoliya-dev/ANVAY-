@@ -29,6 +29,20 @@ export async function connectDB(): Promise<void> {
         name: mongoose.connection.name,
       };
       console.log(`[MongoDB] Successfully connected to MongoDB Atlas: ${mongoose.connection.host}/${mongoose.connection.name}`);
+
+      // Sanitize any conflicting legacy indexes on collections
+      try {
+        const collection = mongoose.connection.collection('therapists');
+        const indexes = await collection.indexes();
+        for (const idx of indexes) {
+          if (idx.name === 'email_1') {
+            console.log('[MongoDB] Dropping conflicting legacy email_1 index on therapists...');
+            await collection.dropIndex('email_1');
+          }
+        }
+      } catch (idxErr) {
+        // Ignore if collection doesn't exist or already dropped
+      }
       return;
     } catch (err: any) {
       console.warn(`[MongoDB] Atlas connection failed: ${err.message}. Initializing fallback database mode so the application remains fully functional.`);

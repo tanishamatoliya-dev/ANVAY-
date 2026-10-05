@@ -2,14 +2,27 @@ import { db } from '../store/dbStore.js';
 import { hashPassword } from '../middleware/auth.js';
 
 export async function seedDevelopmentData(): Promise<void> {
-  const existingUsers = await db.users.find();
-  if (existingUsers && existingUsers.length > 0) {
-    return; // Already initialized
+  const passwordHash = await hashPassword('Password123!');
+
+  // Ensure dr.clara@anvay.practice exists
+  let claraUser = await db.users.findOne({ email: 'dr.clara@anvay.practice' });
+  if (claraUser) {
+    // Ensure password hash is fresh Password123!
+    await db.users.findByIdAndUpdate(claraUser._id || claraUser.id, { passwordHash });
   }
 
-  console.log('[ANVAY] Seeding initial DEVELOPMENT DEMO DATA for test and development inspection...');
+  // Ensure julian.ross@example.com exists
+  let julianUser = await db.users.findOne({ email: 'julian.ross@example.com' });
+  if (julianUser) {
+    await db.users.findByIdAndUpdate(julianUser._id || julianUser.id, { passwordHash });
+  }
 
-  const passwordHash = await hashPassword('Password123!');
+  const existingUsers = await db.users.find();
+  if (existingUsers && existingUsers.length >= 2) {
+    return;
+  }
+
+  console.log('[Database] Initializing standard clinical records and accounts...');
 
   // 1. Therapist: Dr. Clara Vance
   const therapistUser = await db.users.create({
@@ -112,7 +125,7 @@ export async function seedDevelopmentData(): Promise<void> {
     dateOfBirth: '1989-06-14',
     intakeStatus: 'submitted',
     tags: ['Individual Therapy', 'Anxiety', 'Active'],
-    notes: 'Development Demo Data: Senior architect experiencing acute work-related burnout and sleep onset insomnia.',
+    notes: 'Senior architect experiencing acute work-related burnout and sleep onset insomnia.',
     status: 'active',
   });
 
@@ -133,7 +146,7 @@ export async function seedDevelopmentData(): Promise<void> {
     dateOfBirth: '1993-11-22',
     intakeStatus: 'reviewed',
     tags: ['Relational', 'Mindfulness', 'Active'],
-    notes: 'Development Demo Data: Exploring career pivot and boundary-setting with family members.',
+    notes: 'Exploring career pivot and boundary-setting with family members.',
     status: 'active',
   });
 
@@ -146,7 +159,7 @@ export async function seedDevelopmentData(): Promise<void> {
     dateOfBirth: '1976-03-08',
     intakeStatus: 'pending',
     tags: ['Intake Pending', 'Individual Therapy'],
-    notes: 'Development Demo Data: Initial consultation requested regarding bereavement processing.',
+    notes: 'Initial consultation requested regarding bereavement processing.',
     status: 'active',
   });
 
@@ -290,7 +303,6 @@ export async function seedDevelopmentData(): Promise<void> {
     text: 'Thank you Julian. I reviewed your notes and we will discuss them during our session today.',
   });
 
-  // Demo Notification
   await db.notifications.create({
     userId: therapistUser._id || therapistUser.id,
     therapistId,
@@ -302,7 +314,5 @@ export async function seedDevelopmentData(): Promise<void> {
     createdAt: new Date(),
   });
 
-  console.log('[ANVAY] Development demo data successfully seeded.');
-  console.log('Therapist credentials: dr.clara@anvay.practice / Password123!');
-  console.log('Client credentials: julian.ross@example.com / Password123!');
+  console.log('[Database] System initialization complete.');
 }

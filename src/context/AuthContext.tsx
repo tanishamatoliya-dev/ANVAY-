@@ -38,10 +38,13 @@ interface AuthContextType {
   client: any | null;
   token: string | null;
   loading: boolean;
+  isGuestMode: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (payload: any) => Promise<void>;
   logout: () => void;
   quickDemoLogin: (role: 'therapist' | 'client') => Promise<void>;
+  enterGuestMode: (role?: 'therapist' | 'client') => Promise<void>;
+  exitGuestMode: () => void;
   refreshUser: () => Promise<void>;
 }
 
@@ -52,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [therapist, setTherapist] = useState<TherapistProfile | null>(null);
   const [client, setClient] = useState<any | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('anvay_token'));
+  const [isGuestMode, setIsGuestMode] = useState<boolean>(localStorage.getItem('anvay_guest_mode') === 'true');
   const [loading, setLoading] = useState<boolean>(true);
 
   const refreshUser = async () => {
@@ -71,6 +75,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err) {
       console.warn('Authentication token expired or invalid:', err);
       localStorage.removeItem('anvay_token');
+      localStorage.removeItem('anvay_guest_mode');
+      setIsGuestMode(false);
       setToken(null);
       setUser(null);
       setTherapist(null);
@@ -99,11 +105,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(data.token);
     setUser(data.user);
     setTherapist(data.therapist || null);
-    setClient(null);
+    setClient(data.client || null);
   };
 
   const logout = () => {
     localStorage.removeItem('anvay_token');
+    localStorage.removeItem('anvay_guest_mode');
+    setIsGuestMode(false);
     setToken(null);
     setUser(null);
     setTherapist(null);
@@ -126,6 +134,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const enterGuestMode = async (role: 'therapist' | 'client' = 'therapist') => {
+    setLoading(true);
+    try {
+      localStorage.setItem('anvay_guest_mode', 'true');
+      setIsGuestMode(true);
+      await quickDemoLogin(role);
+    } catch (err) {
+      console.error('Failed to enter guest mode:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exitGuestMode = () => {
+    logout();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -134,10 +160,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         client,
         token,
         loading,
+        isGuestMode,
         login,
         register,
         logout,
         quickDemoLogin,
+        enterGuestMode,
+        exitGuestMode,
         refreshUser,
       }}
     >

@@ -1,15 +1,56 @@
 import React from 'react';
-import { Calendar, FileText, CreditCard, MessageSquare, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import {
+  Calendar,
+  FileText,
+  CreditCard,
+  MessageSquare,
+  ShieldCheck,
+  Sparkles,
+  ArrowRight,
+  Clock,
+  Compass,
+} from 'lucide-react';
 
-interface LandingPageProps {
+interface LandingProps {
   onNavigate: (tab: string) => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
+export const LandingPage: React.FC<LandingProps> = ({ onNavigate }) => {
+  const { enterGuestMode } = useAuth();
+
+  const handleExplore = async (role: 'therapist' | 'client' = 'therapist') => {
+    try {
+      await enterGuestMode(role);
+      onNavigate(role === 'therapist' ? 'dashboard' : 'portal');
+    } catch (err) {
+      console.error(err);
+      onNavigate('dashboard');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#fbfbf9] text-[#1e2321]">
-      {/* Top Bar */}
-      <header className="border-b border-[#e7e5dc] bg-[#fdfdfc]/80 backdrop-blur-xs px-6 md:px-12 h-16 flex items-center justify-between sticky top-0 z-20">
+    <div className="min-h-screen bg-[#fbfbf9] text-[#1e2321] selection:bg-[#dedacb]">
+      {/* Editorial Announcement Banner */}
+      <div className="bg-[#1e2321] text-[#e8e5dc] px-4 py-2 text-xs flex items-center justify-between">
+        <div className="max-w-5xl mx-auto w-full flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="font-medium text-[11px] sm:text-xs">
+              Open Guest Exploration Active: No registration or sign-in required to test all features.
+            </span>
+          </div>
+          <button
+            onClick={() => handleExplore('therapist')}
+            className="text-[11px] font-semibold underline underline-offset-4 hover:text-white shrink-0"
+          >
+            Launch Guest Demo →
+          </button>
+        </div>
+      </div>
+
+      {/* Top Header */}
+      <header className="border-b border-[#e7e5dc] bg-[#fdfdfc]/90 backdrop-blur-xs px-6 md:px-12 h-16 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded bg-[#1e2321] text-[#fbfbf9] flex items-center justify-center font-serif text-lg font-bold">
             A
@@ -19,30 +60,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           </span>
         </div>
 
-        <nav className="flex items-center gap-4 text-xs font-medium">
+        <nav className="flex items-center gap-3">
           <button
-            onClick={() => onNavigate('public_booking_dr-clara-vance')}
-            className="text-[#556259] hover:text-[#1e2321] hidden sm:block"
+            onClick={() => handleExplore('therapist')}
+            className="px-3.5 py-1.5 text-xs font-semibold text-[#1e2321] bg-[#f0ede4] hover:bg-[#e6e2d6] border border-[#d2cebf] rounded flex items-center gap-1.5 transition-colors"
           >
-            Sample Public Profile
+            <Compass className="w-3.5 h-3.5 text-emerald-800" />
+            <span>Explore (No Sign-in)</span>
           </button>
           <button
             onClick={() => onNavigate('login')}
-            className="px-3.5 py-1.5 border border-[#d8d4c8] rounded text-[#2c3730] hover:bg-[#f3f0e6]"
+            className="px-3 py-1.5 text-xs font-medium text-[#46534b] hover:text-[#1e2321] transition-colors"
           >
             Sign In
           </button>
           <button
             onClick={() => onNavigate('register')}
-            className="px-4 py-1.5 bg-[#1e2321] text-white rounded hover:bg-[#2e3732] shadow-xs"
+            className="px-4 py-1.5 text-xs font-medium text-white bg-[#1e2321] hover:bg-[#2e3732] rounded shadow-xs transition-colors"
           >
-            Create Practice
+            Create Account
           </button>
         </nav>
       </header>
 
-      {/* Hero Section (Restrained Editorial, Zero Fluff) */}
-      <section className="max-w-5xl mx-auto px-6 pt-16 pb-20 md:pt-24 md:pb-28">
+      {/* Hero Section */}
+      <section className="max-w-5xl mx-auto px-6 pt-14 pb-20 md:pt-20 md:pb-24">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#f2efe6] border border-[#ded8cb] text-xs text-[#415046] mb-6 font-medium">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-800" />
           <span>Practice management architecture for licensed therapists</span>
@@ -53,29 +95,39 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         </h1>
 
         <p className="mt-6 text-base sm:text-lg text-[#55625a] max-w-2xl leading-relaxed">
-          ANVAY unifies appointment scheduling, confidential intake, encrypted clinical SOAP notes, Razorpay billing, and secure client communication into one calm, disciplined system.
+          ANVAY unifies appointment scheduling, confidential intake, encrypted clinical SOAP notes, direct practice invoicing, and secure client communication into one calm, disciplined system.
         </p>
 
+        {/* Action Hub with Guest Explore Prominence */}
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <button
-            onClick={() => onNavigate('register')}
-            className="px-5 py-2.5 bg-[#1e2321] text-white text-xs sm:text-sm font-medium rounded hover:bg-[#2c3631] shadow-xs flex items-center gap-2"
+            onClick={() => handleExplore('therapist')}
+            className="px-6 py-3 bg-[#1e2321] text-white text-xs sm:text-sm font-semibold rounded hover:bg-[#2c3631] shadow-xs flex items-center gap-2.5 transition-all"
           >
-            <span>Start Practice Account</span>
+            <Compass className="w-4 h-4 text-emerald-400" />
+            <span>Explore Live Platform (No Sign-in Needed)</span>
             <ArrowRight className="w-4 h-4" />
           </button>
+
           <button
-            onClick={() => onNavigate('dashboard')}
-            className="px-5 py-2.5 bg-[#f2efe6] text-[#28352d] border border-[#d8d3c5] text-xs sm:text-sm font-medium rounded hover:bg-[#eae5d8]"
+            onClick={() => handleExplore('client')}
+            className="px-5 py-3 bg-[#f2efe6] text-[#28352d] border border-[#d8d3c5] text-xs sm:text-sm font-medium rounded hover:bg-[#eae5d8] transition-colors"
           >
-            Explore Live Dashboard
+            View Client Portal Demo
           </button>
+
           <button
             onClick={() => onNavigate('public_booking_dr-clara-vance')}
-            className="px-4 py-2.5 text-[#546259] hover:text-[#1e2321] text-xs sm:text-sm font-medium"
+            className="px-4 py-3 text-[#546259] hover:text-[#1e2321] text-xs sm:text-sm font-medium transition-colors"
           >
-            View Public Booking Flow →
+            Public Booking Page →
           </button>
+        </div>
+
+        <div className="mt-4 flex items-center gap-4 text-[11px] text-[#78847d]">
+          <span>✓ Zero setup required</span>
+          <span>✓ Free guest exploration</span>
+          <span>✓ Switch between Therapist & Client view</span>
         </div>
       </section>
 
@@ -90,7 +142,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3">
+            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3 shadow-xs">
               <div className="w-8 h-8 rounded bg-[#f3efe6] flex items-center justify-center text-[#35433a]">
                 <Calendar className="w-4 h-4" />
               </div>
@@ -102,7 +154,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               </p>
             </div>
 
-            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3">
+            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3 shadow-xs">
               <div className="w-8 h-8 rounded bg-[#f3efe6] flex items-center justify-center text-[#35433a]">
                 <FileText className="w-4 h-4" />
               </div>
@@ -110,23 +162,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 Confidential SOAP Notes
               </h3>
               <p className="text-xs text-[#5e6b63] leading-relaxed">
-                Structured Subjective, Objective, Assessment, and Plan documentation. Encrypted at rest and strictly excluded from client-facing APIs.
+                Therapist-only session documentation with permanent lock capabilities for clinical compliance and privacy.
               </p>
             </div>
 
-            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3">
+            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3 shadow-xs">
               <div className="w-8 h-8 rounded bg-[#f3efe6] flex items-center justify-center text-[#35433a]">
                 <CreditCard className="w-4 h-4" />
               </div>
               <h3 className="font-serif-editorial text-lg font-semibold text-[#1e2321]">
-                Razorpay Billing & Invoices
+                Direct Practice Invoicing
               </h3>
               <p className="text-xs text-[#5e6b63] leading-relaxed">
-                Order creation and cryptographic HMAC signature verification processed entirely server-side. Generates compliant itemized receipts.
+                Itemized invoice generation, payment tracking, and ledger history supporting bank transfers, cards, cash, or insurance reimbursement.
               </p>
             </div>
 
-            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3">
+            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3 shadow-xs">
               <div className="w-8 h-8 rounded bg-[#f3efe6] flex items-center justify-center text-[#35433a]">
                 <MessageSquare className="w-4 h-4" />
               </div>
@@ -134,26 +186,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
                 Real-Time Messaging
               </h3>
               <p className="text-xs text-[#5e6b63] leading-relaxed">
-                Socket.io real-time therapeutic communication channel with typing feedback, read confirmations, and instant notifications.
+                Encrypted communication channel with instant message delivery, unread indicators, and clinical boundary management.
               </p>
             </div>
 
-            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3 md:col-span-2">
+            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3 shadow-xs">
               <div className="w-8 h-8 rounded bg-[#f3efe6] flex items-center justify-center text-[#35433a]">
-                <ShieldCheck className="w-4 h-4" />
+                <Sparkles className="w-4 h-4" />
               </div>
               <h3 className="font-serif-editorial text-lg font-semibold text-[#1e2321]">
-                Strict Data Boundary & Entitlement Separation
+                AI Clinical Assistant
               </h3>
               <p className="text-xs text-[#5e6b63] leading-relaxed">
-                Centralized subscription governance controls feature access across Starter, Professional, and Practice tiers. Client accounts can never inspect therapist private notes or cross-tenant records.
+                Objective intake synthesis, draft SOAP note formatting, and therapeutic correspondence structuring powered by Google Gemini.
+              </p>
+            </div>
+
+            <div className="p-6 bg-white border border-[#e2dfd5] rounded space-y-3 shadow-xs">
+              <div className="w-8 h-8 rounded bg-[#f3efe6] flex items-center justify-center text-[#35433a]">
+                <Clock className="w-4 h-4" />
+              </div>
+              <h3 className="font-serif-editorial text-lg font-semibold text-[#1e2321]">
+                Client Self-Service
+              </h3>
+              <p className="text-xs text-[#5e6b63] leading-relaxed">
+                Dedicated client portal for upcoming appointments, digital intake questionnaires, invoice records, and telehealth links.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Editorial Footer */}
+      {/* Footer */}
       <footer className="border-t border-[#e7e5dc] py-12 px-6 md:px-12 bg-white text-xs text-[#637068]">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -162,10 +226,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           </div>
 
           <div className="flex items-center gap-6">
-            <button onClick={() => onNavigate('privacy-policy')} className="hover:text-[#1e2321]">
+            <button
+              onClick={() => handleExplore('therapist')}
+              className="text-emerald-800 font-medium hover:underline"
+            >
+              Guest Explorer
+            </button>
+            <button
+              onClick={() => onNavigate('privacy-policy')}
+              className="hover:text-[#1e2321] transition-colors"
+            >
               Privacy Policy
             </button>
-            <button onClick={() => onNavigate('terms-and-conditions')} className="hover:text-[#1e2321]">
+            <button
+              onClick={() => onNavigate('terms-and-conditions')}
+              className="hover:text-[#1e2321] transition-colors"
+            >
               Terms and Conditions
             </button>
           </div>

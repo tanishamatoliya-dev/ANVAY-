@@ -22,6 +22,7 @@ const UserSchema = new Schema<IUser>({
 // 2. Therapist
 export interface ITherapist extends Document {
   userId: string;
+  email?: string;
   professionalName: string;
   title: string;
   bio: string;
@@ -50,6 +51,7 @@ export interface ITherapist extends Document {
 
 const TherapistSchema = new Schema<ITherapist>({
   userId: { type: String, required: true, index: true },
+  email: { type: String, lowercase: true, trim: true },
   professionalName: { type: String, required: true },
   title: { type: String, default: 'Licensed Clinical Psychologist' },
   bio: { type: String, default: '' },

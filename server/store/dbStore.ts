@@ -28,7 +28,6 @@ import {
 } from '../models/schemas.js';
 import { dbStatus } from '../config/db.js';
 
-// Resilient memory collections to guarantee smooth operation
 class MemoryCollection<T extends { _id?: string; id?: string }> {
   private items: Map<string, T> = new Map();
 
@@ -109,7 +108,6 @@ export const memSubscriptions = new MemoryCollection<any>('subscriptions');
 export const memMessages = new MemoryCollection<any>('messages');
 export const memNotifications = new MemoryCollection<any>('notifications');
 
-// Store accessor that uses Mongoose when connected or memory when Atlas is standby
 export const db = {
   isAtlas(): boolean {
     return dbStatus.connected && dbStatus.type === 'atlas';
@@ -131,6 +129,14 @@ export const db = {
     async find() {
       if (db.isAtlas()) return UserModel.find().lean();
       return memUsers.find();
+    },
+    async update(id: string, data: any) {
+      if (db.isAtlas()) return UserModel.findByIdAndUpdate(id, data, { new: true }).lean();
+      return memUsers.findByIdAndUpdate(id, data);
+    },
+    async findByIdAndUpdate(id: string, data: any) {
+      if (db.isAtlas()) return UserModel.findByIdAndUpdate(id, data, { new: true }).lean();
+      return memUsers.findByIdAndUpdate(id, data);
     }
   },
 
